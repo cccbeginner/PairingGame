@@ -31,6 +31,19 @@ class Game:
         self._addCharacterTimer = Timer(1.5, self.addRandomCharacter, True)
         self._addCharacterTimer.start()
 
+        # Add background sound
+        pygame.mixer.init()
+        sound1 = pygame.mixer.Sound("Sound/bg-music.wav")  # 替換為第一個 WAV 文件名稱
+        sound2 = pygame.mixer.Sound("Sound/bg-snow.mp3")  # 替換為第二個 WAV 文件名稱
+        sound1.play(loops=-1, fade_ms=2000)
+        sound2.play(loops=-1, fade_ms=2000)
+
+        # Load sound effects
+        self.sound_shoot = pygame.mixer.Sound("Sound/shoot.mp3")
+        self.sound_shoot.set_volume(0.8)
+        self.sound_pair = pygame.mixer.Sound("Sound/pair.mp3")
+        self.sound_game_over = pygame.mixer.Sound("Sound/game-over.mp3")
+
 
     def addRandomCharacter(self):
         boy_cnt = len([ch for ch in self.character_line.characters if ch.sex == 1])
@@ -51,11 +64,13 @@ class Game:
         if not self.tree.alive:
             self.wait = True
             self.run = False
+            self.sound_game_over.play()
         
         for arrow in self.arrows:
             arrow.update()
             if arrow.has_arrive_target():
                 self.setCharacterColor(arrow.color)
+                self.sound_shoot.play()
         self.arrows = [arrow for arrow in self.arrows if not arrow.has_arrive_target()]
 
     def draw(self, screen : pygame.Surface):
@@ -72,7 +87,6 @@ class Game:
 
         for arrow in self.arrows:
             self.view.draw_arrow(arrow, screen)
-        
         
         self.draw_text(screen, f"{self.cnt_successful_pair}", 50, WHITE, False, SCREEN_WIDTH-100, 100)
 
@@ -124,6 +138,7 @@ class Game:
         if newCharacterPair != None:
             self.character_pairs.append(newCharacterPair)
             self.cnt_successful_pair += 1
+            self.sound_pair.play()
     
     def moveUpCharacterPairs(self) -> None:
         for i in range(len(self.character_pairs)-1, -1, -1):
