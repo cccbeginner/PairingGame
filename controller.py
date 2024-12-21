@@ -20,7 +20,9 @@ class Game:
         self.character_line : CharacterLine = None
         self.character_pairs : list[CharacterPair] = []
         self.arrows : list[Arrow] = []
-        self.cnt_successful_pair = 0
+        self.success = False
+        self.level = 0
+        self.remain_pairs = 1
         self.init_model()
 
         self.color_btn = ColorButtonList()
@@ -28,8 +30,8 @@ class Game:
             color = self.possible_colors[i]
             self.color_btn.add_button(SCREEN_WIDTH//2 - 120 +i*60, SCREEN_HEIGHT - 80, 40, 40, color)
 
-        self._addCharacterTimer = Timer(1.5, self.addRandomCharacter, True)
-        self._addCharacterTimer.start()
+        self._characterTimer = list[Timer]
+        self.init_level()
 
         # Add background sound
         pygame.mixer.init()
@@ -44,27 +46,30 @@ class Game:
         self.sound_pair = pygame.mixer.Sound("Sound/pair.mp3")
         self.sound_game_over = pygame.mixer.Sound("Sound/game-over.mp3")
 
+    def init_level(self):
+        self.remain_pairs = len(LEVEL[self.level]) // 2
+        self._characterTimer = []
+        for spawn_time, sex, speed in LEVEL[self.level]:
+            f = lambda sex=sex, speed=speed : self.addCharacter(sex, speed)
+            self._characterTimer.append(Timer(spawn_time, f, False))
+            self._characterTimer[-1].start()
 
-    def addRandomCharacter(self):
-        boy_cnt = len([ch for ch in self.character_line.characters if ch.sex == 1])
-        girl_cnt = len(self.character_line.characters) - boy_cnt
-        speed = random.uniform(0.5, 1) * (1 + 0.3 * self.cnt_successful_pair)
-        if boy_cnt - girl_cnt >= 3:
-            self.addCharacter(0, False, 70, 160, speed)
-        elif girl_cnt - boy_cnt >= 3:
-            self.addCharacter(1, False, 70, 160, speed)
-        else:
-            self.addCharacter(random.randint(0,1), False, 70, 160, speed)
-
-    def update(self):
-        self.moveCharacterLine()
-        self.moveUpCharacterPairs()
-        self._addCharacterTimer.update()
-        self.tree.shake(self.character_line.numCharactersWaiting*0.1)
+    def check_if_done(self):
         if not self.tree.alive:
             self.wait = True
             self.run = False
             self.sound_game_over.play()
+        if self.remain_pairs == 0:
+            self.wait = True
+            self.run = False
+            self.sound_game_over.play()
+
+    def update(self):
+        self.moveCharacterLine()
+        self.moveUpCharacterPairs()
+        for timer in self._characterTimer:
+            timer.update()
+        self.tree.shake(self.character_line.numCharactersWaiting*0.1)
         
         for arrow in self.arrows:
             arrow.update()
@@ -72,6 +77,8 @@ class Game:
                 self.setCharacterColor(arrow.color)
                 self.sound_shoot.play()
         self.arrows = [arrow for arrow in self.arrows if not arrow.has_arrive_target()]
+
+        self.check_if_done()
 
     def draw(self, screen : pygame.Surface):
         self.view.draw_background(screen)
@@ -88,11 +95,15 @@ class Game:
         for arrow in self.arrows:
             self.view.draw_arrow(arrow, screen)
         
-        self.draw_text(screen, f"{self.cnt_successful_pair}", 50, WHITE, False, SCREEN_WIDTH-100, 100)
+        self.draw_text(screen, f"Level {self.level+1}", 50, WHITE, False, SCREEN_WIDTH-150, 50)
 
         if self.run == False:
-            self.draw_text(screen, f"You successfully make {self.cnt_successful_pair} pairs!", 50, RED, False, SCREEN_WIDTH/2, SCREEN_HEIGHT/2-50)
-            self.draw_text(screen, "Press R to Restart", 50, RED, False, SCREEN_WIDTH/2-25, SCREEN_HEIGHT/2+50)
+            if self.remain_pairs > 0:
+                self.draw_text(screen, f"Oops your tree got attack!", 50, YELLOW, False, SCREEN_WIDTH/2+30, SCREEN_HEIGHT/2-50)
+                self.draw_text(screen, "Press R to continue!", 50, RED, False, SCREEN_WIDTH/2-25, SCREEN_HEIGHT/2+50)
+            else:
+                self.draw_text(screen, f"You successfully pass Level {self.level+1}!", 50, RED, False, SCREEN_WIDTH/2, SCREEN_HEIGHT/2-50)
+                self.draw_text(screen, "Press R to continue!", 50, RED, False, SCREEN_WIDTH/2-25, SCREEN_HEIGHT/2+50)
 
     def draw_text(self, surface, text, size, color, bold, x, y):
         font = pygame.font.SysFont("Arial", size=size)
@@ -113,6 +124,9 @@ class Game:
     def reset(self):
         self.wait = False
         self.run = True
+        if self.remain_pairs == 0:
+            self.level += 1
+        self.init_level()
         self.init_model()
     
     def init_model(self):
@@ -121,14 +135,14 @@ class Game:
         self.character_line = CharacterLine(220)
         self.character_pairs : list[CharacterPair] = []
         self.arrows : list[Arrow] = []
-        self.cnt_successful_pair = 0
 
     def addArrow(self, x, y, target: Character, color : pygame.Color) -> None:
         self.arrows.append(Arrow(x+100, y+120, target, color))
     
-    def addCharacter(self, sex : int, sameSex: bool, width:int, height:int, speed:int) -> None:
-        self.character_line.addCharacter(sex, sameSex, width, height, speed)
-    
+    def addCharacter(self, sex: int, speed:int):
+        print(sex, speed)
+        self.character_line.addCharacter(sex, False, 70, 160, speed)
+
     def moveCharacterLine(self) -> None:
         self.character_line.moveAllCharacter()
     
@@ -137,7 +151,7 @@ class Game:
         self.character_line.movePointer()
         if newCharacterPair != None:
             self.character_pairs.append(newCharacterPair)
-            self.cnt_successful_pair += 1
+            self.remain_pairs -= 1
             self.sound_pair.play()
     
     def moveUpCharacterPairs(self) -> None:
