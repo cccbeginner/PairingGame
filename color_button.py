@@ -30,13 +30,26 @@ class ColorButton:
         """
         self.rect = pygame.Rect(x, y, width, height)
         self.color = color
+        self.cooldown = 1000
+        self.last_clicked_time = pygame.time.get_ticks()  # 確保開始時可以立即點擊
 
     def draw(self, screen: pygame.Surface) -> None:
         """
         繪製按鈕到畫面上
         :param screen: Pygame 的畫布 (surface)
         """
-        pygame.draw.rect(screen, self.color, self.rect)
+
+        # 計算冷卻比例
+        elapsed_time = pygame.time.get_ticks() - self.last_clicked_time
+        cooldown_ratio = max(0, min(1, elapsed_time / self.cooldown))
+        if cooldown_ratio == 1:
+            pygame.draw.rect(screen, self.color, self.rect)
+        else:
+            # 繪製冷卻進度圓環
+            center = self.rect.center
+            radius = self.rect.width // 2
+            end_angle = -90 + 360 * cooldown_ratio  # Pygame 的角度從 -90 開始
+            pygame.draw.arc(screen, self.color, self.rect.inflate(-10, -10), -90 * (3.14159 / 180), end_angle * (3.14159 / 180), self.rect.width)
 
     def is_clicked(self, event: pygame.event.Event) -> bool:
         """
@@ -44,7 +57,9 @@ class ColorButton:
         :param event: Pygame 的事件
         :return: 如果被按下回傳顏色，否則回傳 None
         """
+        current_time = pygame.time.get_ticks()
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # 左鍵
-            if self.rect.collidepoint(event.pos):
+            if self.rect.collidepoint(event.pos) and (current_time - self.last_clicked_time >= self.cooldown):
+                self.last_clicked_time = current_time
                 return True
         return False
