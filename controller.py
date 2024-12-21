@@ -35,7 +35,7 @@ class Game:
     def addRandomCharacter(self):
         boy_cnt = len([ch for ch in self.character_line.characters if ch.sex == 1])
         girl_cnt = len(self.character_line.characters) - boy_cnt
-        speed = random.uniform(0.5, 1) * (1 + 0.15 * self.cnt_successful_pair)
+        speed = random.uniform(0.5, 1) * (1 + 0.3 * self.cnt_successful_pair)
         if boy_cnt - girl_cnt >= 3:
             self.addCharacter(0, False, 70, 160, speed)
         elif girl_cnt - boy_cnt >= 3:
@@ -59,7 +59,7 @@ class Game:
         self.arrows = [arrow for arrow in self.arrows if not arrow.has_arrive_target()]
 
     def draw(self, screen : pygame.Surface):
-        screen.fill(BLACK)
+        self.view.draw_background(screen)
         self.color_btn.draw(screen)
         
         self.view.draw_jupiter(self.jupiter, screen)
@@ -77,8 +77,8 @@ class Game:
         self.draw_text(screen, f"{self.cnt_successful_pair}", 50, WHITE, False, SCREEN_WIDTH-100, 100)
 
         if self.run == False:
-            self.draw_text(screen, f"Game Over! You successfully make {self.cnt_successful_pair} pairs!", 50, RED, False, SCREEN_WIDTH/2-50, SCREEN_HEIGHT/2)
-            self.draw_text(screen, "Press R to Restart", 50, RED, False, SCREEN_WIDTH/2-25, SCREEN_HEIGHT/2+100)
+            self.draw_text(screen, f"You successfully make {self.cnt_successful_pair} pairs!", 50, RED, False, SCREEN_WIDTH/2, SCREEN_HEIGHT/2-50)
+            self.draw_text(screen, "Press R to Restart", 50, RED, False, SCREEN_WIDTH/2-25, SCREEN_HEIGHT/2+50)
 
     def draw_text(self, surface, text, size, color, bold, x, y):
         font = pygame.font.SysFont("Arial", size=size)

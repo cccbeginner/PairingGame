@@ -1,4 +1,5 @@
 import pygame
+import random
 from setting import *
 from model import *
 from typing import Dict
@@ -17,6 +18,17 @@ class View:
         self.color_img_girl_body: Dict[pygame.Color, pygame.Surface] = self.precalculate_color_img(possible_colors, self.img_girl_body)
         self.color_img_arrow: Dict[pygame.Color, pygame.Surface] = self.precalculate_color_img(possible_colors, self.img_arrow)
         self.color_img_wings: Dict[pygame.Color, pygame.Surface] = self.precalculate_color_img(possible_colors, self.img_wings)
+
+        
+        # 建立雪花列表
+        self.snowflakes = [
+            Snowflake(
+                x=random.randint(0, SCREEN_WIDTH),
+                y=random.randint(0, SCREEN_HEIGHT),
+                radius=random.randint(2, 5),
+                speed=random.randint(1, 3)
+            ) for _ in range(50)
+        ]
     
     def precalculate_color_img(self, possible_colors: list[pygame.Color], img_to_calculate: list[pygame.Color]) -> Dict[pygame.Color, pygame.Surface]:
         color_img_dict = {}
@@ -24,6 +36,13 @@ class View:
             img = self.apply_color_shift(img_to_calculate, color)
             color_img_dict[color] = img
         return color_img_dict
+
+    def draw_background(self, screen: pygame.Surface):
+        screen.fill(BLACK)
+        pygame.draw.rect(screen, SNOW,  pygame.Rect(0, CHARACTER_HEIGHT+100, SCREEN_WIDTH, 300))
+        for snowflake in self.snowflakes:
+            snowflake.fall(SCREEN_HEIGHT)
+            snowflake.draw(screen)
 
     def draw_tree(self, tree : Tree, screen : pygame.Surface):
         image = pygame.transform.scale(self.img_tree, (200, 400))  # 調整圖片大小
@@ -103,3 +122,20 @@ class View:
         image = pygame.transform.scale(image, (width, height))  # 調整圖片大小
         shifted_image = self.apply_color_shift(image, color)
         screen.blit(shifted_image, (x, y))
+
+
+class Snowflake:
+    def __init__(self, x: int, y: int, radius: int, speed: int) -> None:
+        self.x = x
+        self.y = y
+        self.radius = radius
+        self.speed = speed
+
+    def fall(self, screen_height: int) -> None:
+        self.y += self.speed
+        if self.y > screen_height:
+            self.y = 0
+            self.x = random.randint(0, SCREEN_WIDTH)
+
+    def draw(self, screen: pygame.Surface) -> None:
+        pygame.draw.circle(screen, SNOW, (self.x, self.y), self.radius)
