@@ -20,6 +20,7 @@ class Game:
         self.character_line : CharacterLine = None
         self.character_pairs : list[CharacterPair] = []
         self.arrows : list[Arrow] = []
+        self.cnt_successful_pair = 0
         self.init_model()
 
         self.color_btn = ColorButtonList()
@@ -30,7 +31,6 @@ class Game:
         self._addCharacterTimer = Timer(1.5, self.addRandomCharacter, True)
         self._addCharacterTimer.start()
 
-        self.cnt_successful_pair = 0
 
     def addRandomCharacter(self):
         boy_cnt = len([ch for ch in self.character_line.characters if ch.sex == 1])
@@ -107,6 +107,7 @@ class Game:
         self.character_line = CharacterLine(220)
         self.character_pairs : list[CharacterPair] = []
         self.arrows : list[Arrow] = []
+        self.cnt_successful_pair = 0
 
     def addArrow(self, x, y, target: Character, color : pygame.Color) -> None:
         self.arrows.append(Arrow(x+100, y+120, target, color))
