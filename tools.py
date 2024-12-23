@@ -12,37 +12,19 @@ class Timer:
         self.seconds = seconds
         self.callback = callback
         self.loop = loop
-        self.running = False
-        self.start_time = 0
         self.elapsed_time = 0
+        self.running = True
 
-    def start(self):
-        """Start or resume the timer."""
-        if not self.running:
-            self.start_time = pygame.time.get_ticks() - self.elapsed_time
-            self.running = True
-
-    def stop(self):
-        """Stop the timer and reset the elapsed time."""
-        self.running = False
-        self.elapsed_time = 0
-
-    def pause(self):
-        """Pause the timer."""
-        if self.running:
-            self.elapsed_time = pygame.time.get_ticks() - self.start_time
-            self.running = False
-
-    def update(self):
+    def update(self, delta):
         """
         Update the timer. Should be called every frame in the game loop.
         Executes the callback if the timer completes.
         """
         if self.running:
-            current_time = pygame.time.get_ticks()
-            if (current_time - self.start_time) / 1000 >= self.seconds:
+            self.elapsed_time += delta
+            if self.elapsed_time >= self.seconds:
                 self.callback()
                 if self.loop:
-                    self.start_time = current_time
+                    self.elapsed_time = 0
                 else:
-                    self.stop()
+                    self.running = False

@@ -17,6 +17,8 @@ YELLOW = (255, 255, 0)
 ORANGE = (255, 165, 0)
 SNOW = (200, 200, 230)
 
+COLOR_BTN_CD = 2
+
 ## LEVEL[i][j] means character j's data in level i
 ## Each stuff in data means: spawn_time(ms), sex(0,1), speed
 LEVEL = [

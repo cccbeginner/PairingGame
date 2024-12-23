@@ -1,5 +1,6 @@
 from __future__ import annotations
 import pygame
+from setting import *
 
 class ColorButtonList:
     def __init__(self, color_buttons: list[ColorButton] = []):
@@ -30,7 +31,7 @@ class ColorButton:
         """
         self.rect = pygame.Rect(x, y, width, height)
         self.color = color
-        self.cooldown = 1000
+        self.cooldown = COLOR_BTN_CD * 1000
         self.last_clicked_time = pygame.time.get_ticks()  # 確保開始時可以立即點擊
 
     def draw(self, screen: pygame.Surface) -> None:
@@ -63,3 +64,4 @@ class ColorButton:
                 self.last_clicked_time = current_time
                 return True
         return False
+    

@@ -11,7 +11,7 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("My TD Game!!")
 
 clock = pygame.time.Clock()
-
+delta = -1
 
 game = Game()
 
@@ -31,9 +31,14 @@ while running:
 
 
     # Drawing
-    game.update()
+    game.update(delta/1000)
     game.draw(screen)
     
 
     pygame.display.update()
-    clock.tick(FPS)
+
+    if delta == -1: # game just start
+        delta = clock.tick(FPS)
+        delta = clock.tick(FPS)
+    else:
+        delta = clock.tick(FPS)

@@ -3,6 +3,7 @@ import random
 from setting import *
 from model import *
 from typing import Dict
+import math
 
 class View:
     def __init__(self, possible_colors: list[pygame.Color] = []):
@@ -131,6 +132,35 @@ class View:
         text_rect.centerx = x
         text_rect.top = y
         surface.blit(text_surface, text_rect)
+
+    def draw_pointer(self, screen: pygame.Surface, _x, _y, color=(255, 0, 0), size=20, angle=0):
+        # 箭頭主體線條的長度和寬度
+        line_length = size * 2
+        line_width = size // 5
+
+        # 箭頭頭部的大小
+        head_length = size
+        head_width = size // 2
+
+        # 計算箭頭的旋轉角度（弧度）
+        angle_rad = math.radians(angle)
+
+        # 算出箭頭主體的終點位置
+        end_x = _x + line_length * math.cos(angle_rad)
+        end_y = _y - line_length * math.sin(angle_rad)
+
+        # 畫箭頭主體
+        pygame.draw.line(screen, color, (_x, _y), (end_x, end_y), line_width)
+
+        # 算出箭頭頭部的兩個角
+        left_x = end_x - head_length * math.cos(angle_rad - math.radians(30))
+        left_y = end_y + head_length * math.sin(angle_rad - math.radians(30))
+
+        right_x = end_x - head_length * math.cos(angle_rad + math.radians(30))
+        right_y = end_y + head_length * math.sin(angle_rad + math.radians(30))
+
+        # 畫箭頭頭部
+        pygame.draw.polygon(screen, color, [(end_x, end_y), (left_x, left_y), (right_x, right_y)])
 
 
 class Snowflake:
