@@ -26,21 +26,13 @@ while running:
             sys.exit()
             running = False
 
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_r] and game.run == False:
-            game.reset()
-
         # Trigger Event
-        if game.run:
-            game.event_trigger(event)
+        game.event_trigger(event)
 
-    # Update
-    if game.run:
-        game.update()
 
     # Drawing
-    if game.run or game.wait:
-        game.draw(screen)
+    game.update()
+    game.draw(screen)
     
 
     pygame.display.update()

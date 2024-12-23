@@ -123,6 +123,15 @@ class View:
         shifted_image = self.apply_color_shift(image, color)
         screen.blit(shifted_image, (x, y))
 
+    
+    def draw_text(self, surface, text, size, color, bold, x, y):
+        font = pygame.font.SysFont("Arial", size=size)
+        text_surface = font.render(text, True, color)
+        text_rect = text_surface.get_rect()
+        text_rect.centerx = x
+        text_rect.top = y
+        surface.blit(text_surface, text_rect)
+
 
 class Snowflake:
     def __init__(self, x: int, y: int, radius: int, speed: int) -> None:

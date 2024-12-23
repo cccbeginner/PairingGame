@@ -9,9 +9,7 @@ class Game:
     deltaTime = 0
 
     def __init__(self):
-        self.run = True
-        self.wait = False
-
+        self.status = 1 # 0->wait, 1->run, 2->pause
         self.possible_colors : pygame.Color = [RED, GREEN, YELLOW, BLUE, PURPLE]
         self.view = View(self.possible_colors + [WHITE])
 
@@ -56,12 +54,10 @@ class Game:
 
     def check_if_done(self):
         if not self.tree.alive:
-            self.wait = True
-            self.run = False
+            self.status = 0
             self.sound_game_over.play()
         if self.remain_pairs == 0:
-            self.wait = True
-            self.run = False
+            self.status = 0
             self.sound_game_over.play()
 
     def update(self):
@@ -95,23 +91,16 @@ class Game:
         for arrow in self.arrows:
             self.view.draw_arrow(arrow, screen)
         
-        self.draw_text(screen, f"Level {self.level+1}", 50, WHITE, False, SCREEN_WIDTH-150, 50)
+        self.view.draw_text(screen, f"Level {self.level+1}", 50, WHITE, False, SCREEN_WIDTH-150, 50)
 
-        if self.run == False:
+        if self.status == 0:
             if self.remain_pairs > 0:
-                self.draw_text(screen, f"Oops your tree got attack!", 50, YELLOW, False, SCREEN_WIDTH/2+30, SCREEN_HEIGHT/2-50)
-                self.draw_text(screen, "Press R to continue!", 50, RED, False, SCREEN_WIDTH/2-25, SCREEN_HEIGHT/2+50)
+                self.view.draw_text(screen, f"Oops your tree got attack!", 50, YELLOW, False, SCREEN_WIDTH/2+30, SCREEN_HEIGHT/2-50)
+                self.view.draw_text(screen, "Press R to continue!", 50, RED, False, SCREEN_WIDTH/2-25, SCREEN_HEIGHT/2+50)
             else:
-                self.draw_text(screen, f"You successfully pass Level {self.level+1}!", 50, RED, False, SCREEN_WIDTH/2, SCREEN_HEIGHT/2-50)
-                self.draw_text(screen, "Press R to continue!", 50, RED, False, SCREEN_WIDTH/2-25, SCREEN_HEIGHT/2+50)
+                self.view.draw_text(screen, f"You successfully pass Level {self.level+1}!", 50, RED, False, SCREEN_WIDTH/2, SCREEN_HEIGHT/2-50)
+                self.view.draw_text(screen, "Press R to continue!", 50, RED, False, SCREEN_WIDTH/2-25, SCREEN_HEIGHT/2+50)
 
-    def draw_text(self, surface, text, size, color, bold, x, y):
-        font = pygame.font.SysFont("Arial", size=size)
-        text_surface = font.render(text, True, color)
-        text_rect = text_surface.get_rect()
-        text_rect.centerx = x
-        text_rect.top = y
-        surface.blit(text_surface, text_rect)
 
     def event_trigger(self, event: pygame.event.Event):
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -121,9 +110,12 @@ class Game:
                 if cur_ch != None:
                     self.addArrow(self.jupiter.x, self.jupiter.y, cur_ch, color)
 
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_r]:
+            self.reset()
+
     def reset(self):
-        self.wait = False
-        self.run = True
+        self.status = 1
         if self.remain_pairs == 0:
             self.level += 1
         self.init_level()
