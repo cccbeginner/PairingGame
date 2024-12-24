@@ -1,7 +1,7 @@
 import pygame
 import sys
 from setting import *
-from controller import Game
+from controller import *
 
 
 pygame.init()
@@ -14,6 +14,7 @@ clock = pygame.time.Clock()
 delta = -1
 
 game = Game()
+view = View(BTN_COLORS + [WHITE])
 
 running = True
 

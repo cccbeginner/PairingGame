@@ -1,3 +1,4 @@
+from __future__ import annotations
 import pygame
 import random
 from setting import *
@@ -6,7 +7,12 @@ from typing import Dict
 import math
 
 class View:
+    instance : View = None
+
     def __init__(self, possible_colors: list[pygame.Color] = []):
+        if View.instance == None:
+            View.instance = self
+
         self.img_tree = pygame.image.load("Image/tree.png")
         self.img_jupiter = pygame.image.load("Image/jupiter.png")
         self.img_boy = pygame.image.load("Image/boy.png")
@@ -40,7 +46,7 @@ class View:
 
     def draw_background(self, screen: pygame.Surface):
         screen.fill(BLACK)
-        pygame.draw.rect(screen, SNOW,  pygame.Rect(0, CHARACTER_HEIGHT+100, SCREEN_WIDTH, 300))
+        pygame.draw.rect(screen, SNOW,  pygame.Rect(0, CHARACTER_HEIGHT+140, SCREEN_WIDTH, 300))
         for snowflake in self.snowflakes:
             snowflake.fall(SCREEN_HEIGHT)
             snowflake.draw(screen)
