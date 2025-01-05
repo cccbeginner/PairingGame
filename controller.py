@@ -335,7 +335,7 @@ class ScoreScene(Scene):
             color = BTN_COLORS[i]
             self.color_btn_list.add_button(SCREEN_WIDTH//2 - 120 +i*60, SCREEN_HEIGHT - 80, 40, 40, color)
 
-        self._gen_charcter_timer = Timer(2, self.gen_random_character, True)
+        self._gen_charcter_timer = Timer(1, self.gen_random_character, True)
 
         # Load sound effects
         self.sound_shoot = pygame.mixer.Sound("Sound/shoot.mp3")
