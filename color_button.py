@@ -3,8 +3,8 @@ import pygame
 from setting import *
 
 class ColorButtonList:
-    def __init__(self, color_buttons: list[ColorButton] = []):
-        self._color_buttons = color_buttons
+    def __init__(self):
+        self._color_buttons = []
 
     def add_button(self, x: int, y: int, width: int, height: int, color: tuple[int, int, int]):
         self._color_buttons.append(ColorButton(x, y, width, height, color))

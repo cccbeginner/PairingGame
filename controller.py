@@ -264,7 +264,7 @@ class LevelScene(Scene):
         self.status = 1
         if self.remain_pairs == 0:
             self.level += 1
-        if self.level == len(LEVEL):
+        if self.level == len(LEVEL) - 1:
             self.load_prev_scene()
         self.init_level()
         self.init_model()
